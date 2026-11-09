@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  firstName String   @map("first_name") @db.VarChar(100)
+  lastName  String   @map("last_name") @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  phone     String?  @db.VarChar(20)
+  address   String?  @db.Text
+  city      String?  @db.VarChar(100)
+  country   String?  @db.VarChar(100)
+  postalCode String? @map("postal_code") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([lastName, firstName])
+  @@index([createdAt])
+  @@map("clients")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   String   @map("entity_id") @db.VarChar(255)
+  action     String   @db.VarChar(50)
+  oldData    Json?    @map("old_data")
+  newData    Json?    @map("new_data")
+  userId     String?  @map("user_id") @db.VarChar(255)
+  timestamp  DateTime @default(now())
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@index([userId])
+  @@map("audit_logs")
+}
